@@ -13,8 +13,8 @@ pipeline {
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY}"
     }
 
-  /**  stages {
-        stage("Create an EKS Cluster") {
+    stages {
+       /** stage("Create an EKS Cluster") {
             steps {
                 script {
                     dir('Terraform') {
@@ -23,8 +23,7 @@ pipeline {
                     }
                 }
             }
-        }
-**/
+        } **/
         stage('Logging into Github') {
             steps {
                 script {
