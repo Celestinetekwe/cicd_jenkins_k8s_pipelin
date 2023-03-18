@@ -5,15 +5,15 @@ pipeline {
         AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
         AWS_DEFAULT_REGION = "us-east-1"
-        ECR_REPOSITORY = 'maxrepo'
-        EKS_CLUSTER_NAME = 'max_prod_cluster'
+        ECR_REPOSITORY = 'sample-app'
+        EKS_CLUSTER_NAME = 'Dedicated-cluster'
         NAMESPACE = 'default'
-        AWS_ACCOUNT_ID = '203576913699'
+        AWS_ACCOUNT_ID = '108286109057'
         IMAGE_TAG = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY}"
     }
 
-    stages {
+  /**  stages {
         stage("Create an EKS Cluster") {
             steps {
                 script {
@@ -24,11 +24,11 @@ pipeline {
                 }
             }
         }
-
-        stage('Logging into AWS ECR') {
+**/
+        stage('Logging into Github') {
             steps {
                 script {
-                    checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/MaxcellAyim/cicd_jenkins_k8s_pipelin']])
+                    checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Celestinetekwe/cicd_jenkins_k8s_pipelin']])
                 }
             }
         }
