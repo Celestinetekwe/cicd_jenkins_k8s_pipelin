@@ -43,19 +43,32 @@ pipeline {
         stage('Push to ECR') {
             steps {
                 script {
-                    sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
-                    sh "docker tag ${ECR_REPOSITORY}:${IMAGE_TAG} ${REPOSITORY_URI}:${IMAGE_TAG}"
-                    sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}"
+                    sh '''
+                        aws configure set aws_access_key_id AWS_ACCESS_KEY_ID;
+                        aws configure set aws_secret_access_key AWS_SECRET_ACCESS_KEY;
+                        aws configure set region AWS_DEFAULT_REGION;
+                        aws eks update-kubeconfig --name EKS_CLUSTER_NAME;
+                        export KUBECONFIG=~/.kube/config;
+                        kubectl get nodes
+                    '''
                 }
             }
         }
 
+        stage('Permission to EKS') {
+            steps {
+                script {
+                    sh "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} --kubeconfig /tmp/kubeconfig"
+                    sh "kubectl set image deployment/nginx nginx=${REPOSITORY_URI}:${IMAGE_TAG} -n ${NAMESPACE} --kubeconfig /tmp/kubeconfig"
+                    sh "kubectl apply -f kubernetes/service.yaml --kubeconfig /tmp/kubeconfig -n ${NAMESPACE}"
+                }
+            }
         stage('Deploy to EKS') {
             steps {
                 script {
-                    sh "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} --kubeconfig ~/.kube/config"
-                    sh "kubectl set image deployment/nginx nginx=${REPOSITORY_URI}:${IMAGE_TAG} -n ${NAMESPACE} --kubeconfig ~/.kube/config"
-                    sh "kubectl apply -f kubernetes/service.yaml --kubeconfig ~/.kube/config -n ${NAMESPACE}"
+                    /*sh "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} --kubeconfig /tmp/kubeconfig"*/
+                    sh "kubectl set image deployment/nginx nginx=${REPOSITORY_URI}:${IMAGE_TAG} -n ${NAMESPACE} --kubeconfig /tmp/kubeconfig"
+                    sh "kubectl apply -f kubernetes/service.yaml --kubeconfig /tmp/kubeconfig -n ${NAMESPACE}"
                 }
             }
         }
