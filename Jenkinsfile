@@ -49,26 +49,13 @@ pipeline {
                 }
             }
         }
-
-        stage('Permission to EKS') {
-            steps {
-                script {
-                    sh '''
-                        aws configure set aws_access_key_id AWS_ACCESS_KEY_ID;
-                        aws configure set aws_secret_access_key AWS_SECRET_ACCESS_KEY;
-                        aws configure set region AWS_DEFAULT_REGION;
-                        aws eks update-kubeconfig --name EKS_CLUSTER_NAME;
-                        export KUBECONFIG=~/.kube/config;
-                        kubectl get nodes
-                    '''
-                }
-            }
         stage('Deploy to EKS') {
             steps {
                 script {
-                    /*sh "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} --kubeconfig /tmp/kubeconfig"*/
-                    sh "kubectl set image deployment/nginx nginx=${REPOSITORY_URI}:${IMAGE_TAG} -n ${NAMESPACE} --kubeconfig /tmp/kubeconfig"
-                    sh "kubectl apply -f kubernetes/service.yaml --kubeconfig /tmp/kubeconfig -n ${NAMESPACE}"
+                    sh "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION}"
+                    sh "export KUBECONFIG=~/.kube/config"
+                    sh "kubectl set image deployment/nginx nginx=${REPOSITORY_URI}:${IMAGE_TAG} -n ${NAMESPACE} --kubeconfig ~/.kube/config"
+                    sh "kubectl apply -f kubernetes/service.yaml --kubeconfig ~/.kube/config -n ${NAMESPACE}"
                 }
             }
         }
