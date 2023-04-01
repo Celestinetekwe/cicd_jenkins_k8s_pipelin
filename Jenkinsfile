@@ -6,7 +6,7 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
         AWS_DEFAULT_REGION = "us-east-1"
         ECR_REPOSITORY = 'sample-app'
-        EKS_CLUSTER_NAME = 'Dedicated-cluster'
+        EKS_CLUSTER_NAME = 'dedicated-cluster'
         NAMESPACE = 'default'
         AWS_ACCOUNT_ID = '108286109057'
         IMAGE_TAG = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
@@ -19,7 +19,7 @@ pipeline {
                 script {
                     dir('Terraform') {
                         sh "terraform init"
-                        sh "terraform destroy -auto-approve"
+                        sh "terraform apply -auto-approve"
                     }
                 }
             }
