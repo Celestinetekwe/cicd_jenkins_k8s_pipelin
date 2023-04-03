@@ -19,7 +19,7 @@ pipeline {
                 script {
                     dir('Terraform') {
                         sh "terraform init"
-                        sh "terraform apply -auto-approve"
+                        sh "terraform destroy -auto-approve"
                     }
                 }
             }
@@ -49,14 +49,13 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy to EKS') {
             steps {
                 script {
-                    sh "whoami"
-                    sh "sudo kubectl cluster-info"
-                    sh "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} --kubeconfig ~/.kube/config"
-                    sh "kubectl set image deployment/nginx nginx=${REPOSITORY_URI}:${IMAGE_TAG} -n ${NAMESPACE} --kubeconfig ~/.kube/config"
-                    sh "kubectl apply -f kubernetes/service.yaml --kubeconfig ~/.kube/config -n ${NAMESPACE}"
+                    sh "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} --kubeconfig /tmp/kubeconfig"
+                    sh "kubectl set image deployment/nginx nginx=${REPOSITORY_URI}:${IMAGE_TAG} -n ${NAMESPACE} --kubeconfig /tmp/kubeconfig"
+                    sh "kubectl apply -f kubernetes/service.yaml --kubeconfig /tmp/kubeconfig -n ${NAMESPACE}"
                 }
             }
         }
@@ -64,7 +63,7 @@ pipeline {
 
     post {
         always {
-            sh "rm ~/.kube/config"
+            sh "rm /tmp/kubeconfig"
         }
     }
 }
