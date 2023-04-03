@@ -52,6 +52,7 @@ pipeline {
         stage('Deploy to EKS') {
             steps {
                 script {
+                    sh "whoami"
                     sh "kubectl cluster-info"
                     sh "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} --kubeconfig ~/.kube/config"
                     sh "kubectl set image deployment/nginx nginx=${REPOSITORY_URI}:${IMAGE_TAG} -n ${NAMESPACE} --kubeconfig ~/.kube/config"
@@ -63,7 +64,7 @@ pipeline {
 
     post {
         always {
-            sh "rm /tmp/kubeconfig"
+            sh "rm ~/.kube/config"
         }
     }
 }
