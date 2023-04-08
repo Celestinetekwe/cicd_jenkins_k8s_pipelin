@@ -50,17 +50,12 @@ pipeline {
                 }
             }
         }
-        stage('Deploy to AWS') {
-            steps {
-                withAWS(region: 'us-east-1', credentials: 'AWS-CREDENTIALS-ID') {
-                    sh "aws s3 ls"
-                }
-            }
-        }
+       
         stage('Deploy to EKS') {
             steps {
                 script {
                     sh "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} --kubeconfig /tmp/kubeconfig"
+                    sh "aws sts get-caller-identity"
                     sh "kubectl apply -f kubernetes/deployment.yaml --kubeconfig  -n ${NAMESPACE}" 
                     sh "kubectl apply -f kubernetes/service.yam" 
                    /* sh "kubectl set image deployment/nginx nginx=${REPOSITORY_URI}:${IMAGE_TAG} -n ${NAMESPACE} --kubeconfig /tmp/kubeconfig"
