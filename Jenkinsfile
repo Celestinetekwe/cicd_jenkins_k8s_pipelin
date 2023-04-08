@@ -57,7 +57,7 @@ pipeline {
                     sh "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} --kubeconfig /tmp/kubeconfig"
                     sh "aws sts get-caller-identity"
                     sh "aws s3 ls"
-                    sh "kubectl apply -f kubernetes/deployment.yaml --kubeconfig /tmp/kubeconfig" -n ${NAMESPACE}" 
+                    sh "kubectl apply -f kubernetes/deployment.yaml --kubeconfig /tmp/kubeconfig -n ${NAMESPACE}" 
                     sh "kubectl apply -f kubernetes/service.yam" 
                    /* sh "kubectl set image deployment/nginx nginx=${REPOSITORY_URI}:${IMAGE_TAG} -n ${NAMESPACE} --kubeconfig /tmp/kubeconfig"
                     sh "kubectl apply -f kubernetes/service.yaml --kubeconfig /tmp/kubeconfig -n ${NAMESPACE}" */
