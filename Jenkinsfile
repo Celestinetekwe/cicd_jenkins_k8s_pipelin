@@ -50,10 +50,10 @@ pipeline {
                 }
             }
         }
-        stage('Deploy to Kubernetes') {
+        stage('Deploy to AWS') {
             steps {
-                withKubeConfig(credentialsId: 'Kubeconfig') {
-                    sh "kubectl apply -f kubernetes/deployment.yaml"
+                withAWS(region: 'us-east-1', credentials: 'aws-credentials-id') {
+                    sh "aws s3 ls"
                 }
             }
         }
