@@ -50,12 +50,18 @@ pipeline {
                 }
             }
         }
-
+        stage('Deploy to Kubernetes') {
+            steps {
+                withKubeConfig(credentialsId: 'Kubeconfig') {
+                    sh "kubectl apply -f kubernetes/deployment.yaml"
+                }
+            }
+        }
         stage('Deploy to EKS') {
             steps {
                 script {
                     sh "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} --kubeconfig /tmp/kubeconfig"
-                    sh "kubectl apply -f kubernetes/deployment.yaml --kubeconfig kubeconfigC -n ${NAMESPACE}" 
+                    sh "kubectl apply -f kubernetes/deployment.yaml --kubeconfig  -n ${NAMESPACE}" 
                     sh "kubectl apply -f kubernetes/service.yam" 
                    /* sh "kubectl set image deployment/nginx nginx=${REPOSITORY_URI}:${IMAGE_TAG} -n ${NAMESPACE} --kubeconfig /tmp/kubeconfig"
                     sh "kubectl apply -f kubernetes/service.yaml --kubeconfig /tmp/kubeconfig -n ${NAMESPACE}" */
