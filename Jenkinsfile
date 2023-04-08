@@ -4,6 +4,7 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        kubeconfigC=credentials('Kubeconfig')
         AWS_DEFAULT_REGION = "us-east-1"
         ECR_REPOSITORY = 'sample-app'
         EKS_CLUSTER_NAME = 'dedicated-cluster'
@@ -54,8 +55,7 @@ pipeline {
             steps {
                 script {
                     sh "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_DEFAULT_REGION} --kubeconfig /tmp/kubeconfig"
-                    sh "cat /tmp/kubeconfig"
-                    sh "kubectl apply -f kubernetes/deployment.yaml --kubeconfig /tmp/kubeconfig -n ${NAMESPACE}" 
+                    sh "kubectl apply -f kubernetes/deployment.yaml --kubeconfig kubeconfigC -n ${NAMESPACE}" 
                     sh "kubectl apply -f kubernetes/service.yam" 
                    /* sh "kubectl set image deployment/nginx nginx=${REPOSITORY_URI}:${IMAGE_TAG} -n ${NAMESPACE} --kubeconfig /tmp/kubeconfig"
                     sh "kubectl apply -f kubernetes/service.yaml --kubeconfig /tmp/kubeconfig -n ${NAMESPACE}" */
